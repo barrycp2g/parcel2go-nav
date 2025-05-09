@@ -1,91 +1,127 @@
-// src/components/NavigationSet.js
 import React, { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 
-// If you prefer to host the logo locally, download it and import instead.
-const LOGO_URL = 'https://www.parcel2go.com/Content/Images/logo.svg'
+const LOGO = '/logo.svg'
 
-const navConfigs = {
-  existingLoggedOut: {
-    items: [
-      { label: 'Business', href: '/business' },
-      { label: 'Get a Quote', href: '/quick-quote' },
-      {
-        label: 'Services',
-        href: '/services',
-        submenuCols: [
-          {
-            header: 'Range of Couriers',
-            items: [
-              'All Couriers','Royal Mail','FedEx Express','Parcelforce','UPS','UPS Access Point',
-              'TNT','Evri Drop-off','DPD','Yodel Direct','Evri Collection','CitySprint','InPost',
-              'DHL','DHL Parcel','DX','Whistl','Relay (NEW)','Business Account'
-            ]
-          },
-          {
-            header: 'UK Parcel Delivery',
-            items: [
-              'All UK Delivery Services','Postage Costs','Large Parcels','Drop-Off Services',
-              'Collection Services','eBay Quicksend','Pallet Delivery','Same-Day Delivery',
-              'Letters & Small Parcels','Next-Day Delivery','Weekend Delivery','Small Parcels',
-              'No Printer Couriers','3 Day Delivery','Heavy Parcels','2 to 3 Day',
-              'Express Delivery','Recorded Delivery','Evri Postable'
-            ]
-          },
-          {
-            header: 'International Parcel Delivery',
-            items: [
-              'EU Shipping Info (NEW)','All International Delivery','Economy Delivery',
-              'Express Delivery','Germany Delivery','Australia Delivery','Spain Delivery',
-              'USA Delivery','Asia Delivery','Worldwide Delivery','Delivery Services'
-            ]
-          },
-          {
-            header: 'Delivery Tools',
-            items: [
-              'Parcel2Go Prepay','Postcode Finder','Parcel Volume Calculator',
-              'Print Your Labels','Print a Commercial Invoice','Rearrange Your Collection',
-              'Prohibited Items','Track a Parcel','Content Hub','Parcel Delivery Advice',
-              'Mobile App','Ecommerce Shipping','Despatch Bay Alternative'
-            ]
-          }
-        ]
-      },
-      { label: 'Track a Parcel', href: '/tracking' },
-      {
-        label: 'Smart Send',
-        href: '/smartsend',
-        submenuCols: [
-          {
-            items: [
-              'What is SmartSend?','Go To SmartSend','Royal Mail OBA',
-              'Bulk Send With Whistl','NOTHS Delivery'
-            ]
-          },
-          {
-            items: [
-              'Shopify Delivery','EKM Delivery','eBay Delivery','Amazon Delivery',
-              'TikTok Delivery','PrestaShop Delivery','Etsy Delivery','Wix Delivery',
-              'Magento Delivery','ShopWired Delivery','SquareSpace Delivery',
-              'OnBuy Delivery','WooCommerce Delivery','BigCommerce Delivery',
-              'Bluepark Delivery'
-            ]
-          }
-        ]
-      },
-      { label: 'Help', href: '/help' },
-      { icon: 'cart', href: '/basket' },
-      { label: 'Sign In', href: '/login', isButton: true }
-    ]
-  },
+const NAVS = {
+  // … (keep your existingLoggedOut, existingLoggedIn, newLoggedOut, newLoggedIn configs from last time)
+}
 
-  existingLoggedIn: {
-    items: [
-      { label: 'Business', href: '/business' },
-      { label: 'Get a Quote', href: '/quick-quote' },
-      /* copy the same Services config from above */,
-      /* copy the same 'Track a Parcel' */,
-      /* copy the same Smart Send config */,
-      { label: 'Help', href: '/help' },
-      {
-        label
+export default function NavigationSet({ title, variant }) {
+  const [mobile, setMobile] = useState(false)
+  const [open, setOpen] = useState(false)
+  const cfg = NAVS[variant]
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">{title}</h2>
+
+      {/* Toggle */}
+      <button
+        onClick={() => setMobile(!mobile)}
+        className="px-3 py-1 border rounded text-sm"
+      >
+        {mobile ? 'Switch to Desktop' : 'Switch to Mobile'}
+      </button>
+
+      <nav className="bg-white border-b">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4">
+          {/* Logo */}
+          <a href="/" className="flex-shrink-0">
+            <img src={LOGO} alt="Parcel2Go" className="h-8" />
+          </a>
+
+          {/* Desktop */}
+          {!mobile && (
+            <ul className="flex space-x-8 font-medium text-sm">
+              {cfg.items.map((item, i) => (
+                <li key={i} className="relative group">
+                  {/* Link or button */}
+                  {item.isButton ? (
+                    <a
+                      href={item.href}
+                      className="px-4 py-1 bg-blue-600 text-white rounded"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <a href={item.href} className="hover:text-blue-600">
+                      {item.icon === 'cart' ? '🛒' : item.label}
+                    </a>
+                  )}
+
+                  {/* Dropdown */}
+                  {item.submenuCols && (
+                    <div className="absolute left-0 top-full hidden group-hover:block w-screen max-w-5xl bg-white shadow-lg border mt-2 p-6 z-10">
+                      <div className="grid grid-cols-4 gap-6">
+                        {item.submenuCols.map((col, xi) => (
+                          <div key={xi}>
+                            {col.header && (
+                              <h5 className="font-semibold mb-2">{col.header}</h5>
+                            )}
+                            <ul className="space-y-1 text-sm">
+                              {col.items.map((link, yi) => (
+                                <li key={yi}>
+                                  <a href="#" className="block hover:text-blue-600">
+                                    {link}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Mobile hamburger */}
+          {mobile && (
+            <button onClick={() => setOpen(!open)} className="text-2xl">
+              {open ? <X /> : <Menu />}
+            </button>
+          )}
+        </div>
+
+        {/* Mobile menu */}
+        {mobile && open && (
+          <div className="px-4 pb-4 bg-white border-t">
+            {cfg.items.map((item, i) => (
+              <div key={i} className="mb-3">
+                <a
+                  href={item.href}
+                  className="block font-medium py-2 text-base hover:text-blue-600"
+                >
+                  {item.icon === 'cart' ? '🛒' : item.label}
+                </a>
+                {item.submenuCols && (
+                  <div className="pl-4">
+                    {item.submenuCols.map((col, xi) => (
+                      <div key={xi} className="mb-4">
+                        {col.header && (
+                          <div className="font-semibold mb-1">{col.header}</div>
+                        )}
+                        {col.items.map((link, yi) => (
+                          <a
+                            key={yi}
+                            href="#"
+                            className="block text-sm py-1 hover:text-blue-600"
+                          >
+                            {link}
+                          </a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </nav>
+    </div>
+  )
+}
